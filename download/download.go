@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/url"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -77,6 +78,13 @@ func download(path, dest string, firstAttempt bool) (root *vcs.RepoRoot, err err
 		}
 		err = root.VCS.Create(fullLocalPath, rootRepo)
 		if err != nil {
+			return root, err
+		}
+		log.Println("Trying to \"go get\" code repo")
+		get := exec.Command("go", "get", "-v", "-t", filepath.Join(path + "/..."))
+		err = get.Run()
+		if err != nil {
+			log.Println("Error recieved while trying to \"go get\"")
 			return root, err
 		}
 	}
