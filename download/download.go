@@ -82,6 +82,7 @@ func download(path, dest string, firstAttempt bool) (root *vcs.RepoRoot, err err
 		}
 		log.Println("Trying to \"go get\" code repo")
 		get := exec.Command("go", "get", "-v", "-t", filepath.Join(path + "/..."))
+		get.Stderr = os.Stderr
 		err = get.Run()
 		if err != nil {
 			log.Println("Error recieved while trying to \"go get\"")
