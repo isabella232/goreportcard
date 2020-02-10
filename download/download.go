@@ -83,6 +83,7 @@ func download(path, dest string, firstAttempt bool) (root *vcs.RepoRoot, err err
 		}
 		log.Println("Trying to \"go get\" code repo")
 		get := exec.Command("go", "get", "-v", "-t", filepath.Join(path + "/..."))
+		get.Env = append(get.Env, "GO111MODULE=on")
 		var stderr bytes.Buffer
 		get.Stderr = &stderr
 		err = get.Run()
