@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"bytes"
 
 	"golang.org/x/tools/go/vcs"
 )
@@ -82,9 +83,11 @@ func download(path, dest string, firstAttempt bool) (root *vcs.RepoRoot, err err
 		}
 		log.Println("Trying to \"go get\" code repo")
 		get := exec.Command("go", "get", "-v", "-t", filepath.Join(path + "/..."))
-		get.Stderr = os.Stderr
+		var stderr bytes.Buffer
+		get.Stderr = &stderr
 		err = get.Run()
 		if err != nil {
+			err = errors.New(stderr.String() + " " + err.Error())
 			log.Println("Error recieved while trying to \"go get\"")
 			return root, err
 		}
