@@ -23,7 +23,7 @@ var (
 
 func addSkipDirs(params []string) []string {
 	for _, dir := range skipDirs {
-		params = append(params, fmt.Sprintf("--skip=%s", dir))
+		params = append(params, fmt.Sprintf("--skip-dirs=%s", dir))
 	}
 	return params
 }
@@ -303,6 +303,8 @@ func GoTool(dir string, filenames, command []string) (float64, []FileSummary, er
 	params = append(params, dir+"/...")
 
 	cmd := exec.Command(command[0], params...)
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return 0, []FileSummary{}, err
@@ -335,11 +337,13 @@ func GoTool(dir string, filenames, command []string) (float64, []FileSummary, er
 	err = cmd.Wait()
 	if exitErr, ok := err.(*exec.ExitError); ok {
 		// The program has exited with an exit code != 0
-
+		log.Println(stderr.String())
 		if status, ok := exitErr.Sys().(syscall.WaitStatus); ok {
 			// some commands exit 1 when files fail to pass (for example go vet)
+			log.Println(stderr.String())
 			if status.ExitStatus() != 1 {
 				return 0, failed, err
+				log.Println(stderr.String())
 				// return 0, Error{}, err
 			}
 		}
