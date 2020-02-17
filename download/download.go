@@ -1,6 +1,7 @@
 package download
 
 import (
+	"bytes"
 	"errors"
 	"log"
 	"net/url"
@@ -8,7 +9,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
-	"bytes"
 
 	"golang.org/x/tools/go/vcs"
 )
@@ -82,8 +82,8 @@ func download(path, dest string, firstAttempt bool) (root *vcs.RepoRoot, err err
 			return root, err
 		}
 		log.Println("Trying to \"go get\" code repo")
-		get := exec.Command("go", "get", "-v", "-t", filepath.Join(path + "/..."))
-		get.Env = append(get.Env, "GO111MODULE=on")
+		get := exec.Command("go", "get", "-v", "-t", filepath.Join(path+"/..."))
+		//get.Env = append(get.Env, "GO111MODULE=on")
 		var stderr bytes.Buffer
 		get.Stderr = &stderr
 		err = get.Run()
